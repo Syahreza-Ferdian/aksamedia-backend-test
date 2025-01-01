@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
 
+// Endpoints
 Route::middleware('auth.jwt')->group(function() {
     Route::post('/employees', [EmployeeController::class, 'addNewEmployee']);
     Route::get('/divisions', [DivisiController::class, 'getDivisions']);
