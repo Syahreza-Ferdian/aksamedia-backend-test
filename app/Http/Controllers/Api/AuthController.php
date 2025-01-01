@@ -36,4 +36,10 @@ class AuthController extends Controller
 
         return $this->successResponse('Login success', $responseData);
     }
+
+    public function logout() {
+        auth()->guard('api')->logout();
+
+        return $this->successResponse('Logout success');
+    }
 }
