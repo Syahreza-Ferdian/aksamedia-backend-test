@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\WithUUID;
 
 class EmployeeModel extends Model
 {
-    use HasFactory;
+    use HasFactory, WithUUID;
 
     protected $table = 'employee';
-    protected $keyType = 'string';
-    public $incrementing = false;
 
     protected $fillable = [
         'name',
