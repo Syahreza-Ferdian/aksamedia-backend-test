@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DivisiController;
+use App\Http\Controllers\Api\EmployeeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,4 +18,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/divisions', [DivisiController::class, 'getDivisions']);
+
+Route::middleware('auth.jwt')->group(function() {
+    Route::post('/employees', [EmployeeController::class, 'addNewEmployee']);
+    Route::get('/divisions', [DivisiController::class, 'getDivisions']);
+    Route::get('/employees', [EmployeeController::class, 'getAllEmployeeData']);
+    Route::put('/employees/{id}', [EmployeeController::class, 'updateEmployee']);
+    Route::delete('/employees/{id}', [EmployeeController::class, 'deleteEmployee']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
