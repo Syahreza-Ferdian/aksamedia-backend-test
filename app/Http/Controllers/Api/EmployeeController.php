@@ -33,7 +33,7 @@ class EmployeeController extends Controller
         ];
 
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'required|file|mimes:jpg,jpeg,png|max:2048',
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
             'division' => 'required|string|exists:divisi,id',
@@ -44,7 +44,7 @@ class EmployeeController extends Controller
             return $this->errorResponse('Validation Error', Response::HTTP_BAD_REQUEST, $validator->errors());
         }
 
-        $file = $request->file('file');
+        $file = $request->file('image');
         $cleanedEmployeeName = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $request->name);
         $filePath = uniqid() . '-' . $cleanedEmployeeName;
 
@@ -115,7 +115,9 @@ class EmployeeController extends Controller
         });
 
         $response = [
-            'data' => $employeeDataResponse,
+            'data' => [
+                'employees' => $employeeDataResponse
+            ],
             'pagination' => [
                 'current_page' => $employees->currentPage(),
                 'total_items' => $employees->total(),
@@ -138,12 +140,12 @@ class EmployeeController extends Controller
             return $this->errorResponse('Validation Error', Response::HTTP_BAD_REQUEST, $validator->errors());
         }
 
-        if (!$request->hasAny(['name', 'phone', 'division', 'position']) && !$request->hasFile('file')) {
+        if (!$request->hasAny(['name', 'phone', 'division', 'position']) && !$request->hasFile('image')) {
             return $this->errorResponse('Please fill at least one field to update', Response::HTTP_BAD_REQUEST);
         }
 
         $validator = Validator::make($request->all(), [
-            'file' => 'sometimes|required|file|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'sometimes|required|file|mimes:jpg,jpeg,png|max:2048',
             'name' => 'sometimes|required|string|max:255',
             'phone' => 'sometimes|required|string|max:15',
             'division' => 'sometimes|required|string|exists:divisi,id',
@@ -156,7 +158,7 @@ class EmployeeController extends Controller
 
         $currentEmployeeData = EmployeeModel::find($id);
 
-        $updatedEmployeePhoto = $request->file('file');
+        $updatedEmployeePhoto = $request->file('image');
         if ($updatedEmployeePhoto) {
             try {
                 $filePath = str_replace($this->storageService->getBasePublicUrl(), '', $currentEmployeeData->image);
