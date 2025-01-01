@@ -49,7 +49,9 @@ class DivisiController extends Controller
         }
 
         $response = [
-            'data' => $divisions->items(),
+            'data' => [
+                'divisions' => $divisions->items()
+            ],
             'pagination' => [
                 'current_page' => $divisions->currentPage(),
                 'total_items' => $divisions->total(),
