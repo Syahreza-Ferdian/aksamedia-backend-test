@@ -4,12 +4,15 @@ namespace App\Traits;
 
 trait ApiResponse {
 
-    protected function successResponse($successMessage, $data = [], $pagination = null, $code = 200) {
+    protected function successResponse($successMessage, $data = null, $pagination = null, $code = 200) {
         $response = [
             'status' => 'success',
             'message' => $successMessage,
-            'data' => $data
         ];
+
+        if ($data) {
+            $response['data'] = $data;
+        }
 
         if ($pagination) {
             $response['pagination'] = $pagination;
