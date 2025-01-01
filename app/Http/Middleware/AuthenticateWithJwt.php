@@ -27,7 +27,7 @@ class AuthenticateWithJwt
             $user = auth()->guard('api')->user();
 
             if (!$user) {
-                return $this->errorResponse('Unauthorized: User not found', Response::HTTP_UNAUTHORIZED);
+                return $this->errorResponse('Unauthorized: You need to logged in to access this endpoint', Response::HTTP_UNAUTHORIZED);
             }
 
             $request->merge(['auth_user' => $user]);
