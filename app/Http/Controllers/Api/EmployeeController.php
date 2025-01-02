@@ -71,8 +71,6 @@ class EmployeeController extends Controller
     }
 
     public function getAllEmployeeData(Request $request) {
-        $content_per_page = 2;
-
         $validatorMessage = [
             'string' => 'Kolom :attribute harus berupa string',
             'max' => 'Kolom :attribute tidak boleh lebih dari :max karakter',
@@ -81,7 +79,8 @@ class EmployeeController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'nullable|string|max:255',
-            'divisi_id' => 'nullable|exists:divisi,id'
+            'divisi_id' => 'nullable|exists:divisi,id',
+            'per_page' => 'nullable|integer|min:1'
         ], $validatorMessage);
 
         if ($validator->fails()) {
@@ -89,8 +88,10 @@ class EmployeeController extends Controller
         }
 
         $name = htmlspecialchars($request->query('name', ''), ENT_QUOTES, 'UTF-8');
+
         $divisi_id = htmlspecialchars($request->query('divisi_id', ''), ENT_QUOTES, 'UTF-8');
 
+        $num_content_per_page = $request->query('per_page', 2);
 
         $query = EmployeeModel::when($name, function($query) use ($name) {
             return $query->where('name', 'like', '%' . $name . '%');
@@ -98,7 +99,7 @@ class EmployeeController extends Controller
             return $query->where('divisi_id', $divisi_id);
         });
 
-        $employees = $query->with('divisi')->paginate($content_per_page);
+        $employees = $query->with('divisi')->paginate($num_content_per_page);
 
         $employeeDataResponse = $employees->map(function($employee) {
             return [
