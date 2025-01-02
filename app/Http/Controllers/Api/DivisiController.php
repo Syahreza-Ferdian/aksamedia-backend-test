@@ -7,7 +7,6 @@ use App\Models\DivisiModel;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -17,7 +16,8 @@ class DivisiController extends Controller
 
     public function getDivisions(Request $request) {
         $validator = Validator::make($request->all(), [
-            'name' => 'nullable|string|max:255'
+            'name' => 'nullable|string|max:255',
+            'per_page' => 'nullable|integer|min:1'
         ]);
 
         if ($validator->fails()) {
@@ -25,26 +25,16 @@ class DivisiController extends Controller
         }
 
         $name = htmlspecialchars($request->query('name', ''), ENT_QUOTES, 'UTF-8');
-        $per_page_content = 2;
 
-        $cacheKey = 'division_search_' . hash('sha256', $name . $per_page_content . $request->query('page', 1));
-
-        if (Cache::has($cacheKey)) {
-            $divisions = Cache::get($cacheKey);
-            if (empty($divisions['data'])) {
-                return $this->errorResponse('Data divisi tidak ditemukan', Response::HTTP_NOT_FOUND);
-            }
-            return $this->successResponse('Berhasil mengambil data divisi', $divisions['data'], $divisions['pagination']);
-        }
+        $num_content_per_page = $request->query('per_page', 2);
 
         $query = DivisiModel::when($name, function($query) use ($name) {
             return $query->where('name', 'like', '%' . $name . '%');
         });
 
-        $divisions = $query->paginate($per_page_content);
+        $divisions = $query->paginate($num_content_per_page);
 
         if ($divisions->isEmpty()) {
-            Cache::put($cacheKey, ['data' => [], 'pagination' => []], now()->addMinutes(15));
             return $this->errorResponse('Data divisi tidak ditemukan', Response::HTTP_NOT_FOUND);
         }
 
@@ -61,8 +51,6 @@ class DivisiController extends Controller
                 'prev_page_url' => $divisions->previousPageUrl()
             ]
         ];
-
-        Cache::put($cacheKey, $response, now()->addMinutes(15));
 
         return $this->successResponse('Berhasil mengambil data divisi', $response['data'], $response['pagination']);
     }
