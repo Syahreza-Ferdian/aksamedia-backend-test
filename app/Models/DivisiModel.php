@@ -17,6 +17,11 @@ class DivisiModel extends Model
         'name'
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
+
     public function employee() {
         return $this->hasMany(EmployeeModel::class, 'divisi_id');
     }
