@@ -101,6 +101,10 @@ class EmployeeController extends Controller
 
         $employees = $query->with('divisi')->paginate($num_content_per_page);
 
+        if ($employees->isEmpty()) {
+            return $this->errorResponse('Employee data not found', Response::HTTP_NOT_FOUND);
+        }
+
         $employeeDataResponse = $employees->map(function($employee) {
             return [
                 'id' => $employee->id,
